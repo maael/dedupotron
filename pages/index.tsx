@@ -43,6 +43,9 @@ const styles = {
   },
   selected: {
     border: "2px solid yellow",
+  },
+  notSelected: {
+    filter: 'grayscale(1)'
   }
 };
 
@@ -266,11 +269,12 @@ export default function Index() {
               >
                 <img
                   src={b.icon}
-                  onClick={() => setSelected(b.id)}
+                  onClick={() => setSelected(selected === b.id ? undefined : b.id)}
                   style={{
                     ...styles.icon,
                     ...(dupItems.has(b.id) ? styles.dup : {}),
-                    ...(selected === b.id ? styles.selected : {})
+                    ...(selected === b.id ? styles.selected : {}),
+                    ...(selected && selected !== b.id ? styles.notSelected : {})
                   }}
                 />
               </Tippy>
@@ -326,11 +330,12 @@ export default function Index() {
                           {i && i.icon ? (
                             <img
                               src={i.icon}
-                              onClick={() => setSelected(i.id)}
+                              onClick={() => setSelected(selected === i.id ? undefined : i.id)}
                               style={{
                                 ...styles.icon,
                                 ...(dupItems.has(i.id) ? styles.dup : {}),
-                                ...(selected === i.id ? styles.selected : {})
+                                ...(selected === i.id ? styles.selected : {}),
+                                ...(selected && selected !== i.id ? styles.notSelected : {})
                               }}
                             />
                           ) : (
