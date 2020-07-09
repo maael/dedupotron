@@ -1,0 +1,25 @@
+{
+  "name": "dedupotron",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Matthew Elphick <matt.a.elphy@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@tippyjs/react": "^4.1.0",
+    "gw2api-client": "^7.4.1",
+    "next": "^9.4.4",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.19",
+    "@types/react": "^16.9.41",
+    "typescript": "^3.9.6"
+  }
+}
