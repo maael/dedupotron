@@ -1,22 +1,27 @@
 import Head from "next/head";
-import { useEffect, useState } from "react";
-import client from "gw2api-client";
 import Tippy from "@tippyjs/react";
+import ExclamatonIcon from "../components/icons/ExclamationIcon";
+import chunk from '../util/chunk';
+import useDedupotron from '../components/hooks/useDedupotron';
 
 const BANK_SIZE = 30;
-const INVENTORY_WIDTH = 5;
-
-function chunk(arr, size) {
-  return Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
-    arr.slice(i * size, i * size + size)
-  );
-}
+const INVENTORY_WIDTH = 10;
 
 const descStyles = {
   "@flavour": "color:blue;",
   "@warning": "color:orange;",
   "@abilitytype": "color:red;",
 };
+const rarityColors = {
+  Junk: '#AAA',
+  Basic: '#FFFFFF',
+  Fine: '#62A4DA',
+  Masterwork: '#1a9306',
+  Rare: '#fcd00b',
+  Exotic: '#ffa405',
+  Ascended: '#fb3e8d',
+  Legendary: '#4C139D'
+}
 function cleanDescription(desc: string) {
   return (desc || "")
     .replace(/<br>/g, "\n")
@@ -39,14 +44,14 @@ const styles = {
     margin: 2,
   },
   dup: {
-    border: "2px solid red",
+    border: "2px solid #B33951",
   },
   selected: {
-    border: "2px solid yellow",
+    border: "2px solid #E3D081",
   },
   notSelected: {
-    filter: 'grayscale(1)'
-  }
+    filter: "grayscale(1)",
+  },
 };
 
 /**
@@ -54,133 +59,38 @@ const styles = {
  */
 
 export default function Index() {
-  const [bank, setBank] = useState([]);
-  const [expandedInventories, setExpandedInventories] = useState([]);
-  const [dupItems, setDupItems] = useState(new Set());
-  const [apiKey, setApiKey] = useState(
-    "1FA14943-5E06-9940-A722-9D2A37F447656AD539B5-1260-4AA2-88EF-ABE41626B623"
-  );
-  const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState();
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      try {
-        const api = client().authenticate(apiKey);
-        const localItemCountMap = {};
-        const bank = await api.account().bank().get();
-        const allItemIds = bank
-          .map((item) => {
-            return item ? item.id : null;
-          })
-          .filter(Boolean);
-        const checkedItemIds = bank
-          .map((item) => {
-            return item && item.count < 250 && item.binding !== "Character"
-              ? item.id
-              : null;
-          })
-          .filter(Boolean);
-        checkedItemIds.forEach((id) => {
-          localItemCountMap[id] = (localItemCountMap[id] || 0) + 1;
-        });
-        const items = await api.items().many(allItemIds);
-        const itemMap = new Map<string, any>(
-          items.map((item) => [item.id, item])
-        );
-        const expandedBank = bank.map((item) => ({
-          ...item,
-          ...(item && itemMap.has(item.id) ? itemMap.get(item.id) : {}),
-        }));
-        const characters = await api.characters().all();
-        const inventories = await Promise.all(
-          characters.map(async (c) => ({
-            inventory: await api.characters(c.name).inventory().get(),
-            character: c,
-          }))
-        );
-        const allInventoryItemIds = inventories
-          .flatMap(({ inventory }) => inventory)
-          .filter(Boolean)
-          .flatMap(({ inventory }) =>
-            inventory.map((item) => {
-              return item ? item.id : null;
-            })
-          )
-          .filter(Boolean);
-        const checkedInventoryItemIds = inventories
-          .flatMap(({ inventory }) => inventory)
-          .filter(Boolean)
-          .flatMap(({ inventory }) =>
-            inventory.map((item) => {
-              return item && item.count < 250 && item.binding !== "Character"
-                ? item.id
-                : null;
-            })
-          )
-          .filter(Boolean);
-        checkedInventoryItemIds.forEach((id) => {
-          localItemCountMap[id] = (localItemCountMap[id] || 0) + 1;
-        });
-        const inventoryItems = await api.items().many(allInventoryItemIds);
-        const inventoryItemMap = new Map<string, object>(
-          inventoryItems.map((item) => [item.id, item])
-        );
-        const expandedInventory = inventories.map((i: any) => ({
-          ...i,
-          inventory: i.inventory.map((i2: any) =>
-            i2
-              ? {
-                  ...i2,
-                  inventory: i2.inventory.map((item) => ({
-                    ...item,
-                    ...(item && inventoryItemMap.has(item.id)
-                      ? inventoryItemMap.get(item.id)
-                      : {}),
-                  })),
-                }
-              : i2
-          ),
-        }));
-        setDupItems(
-          new Set(
-            Object.entries(localItemCountMap)
-              .map(([id, count]) => {
-                const item =
-                  itemMap.get(parseInt(id, 10) as any) ||
-                  inventoryItemMap.get(parseInt(id, 10) as any);
-                if (item && (item.charges || item.count >= 250)) {
-                  return undefined;
-                }
-                return count > 1 ? parseInt(id) : undefined;
-              })
-              .filter(Boolean)
-          )
-        );
-        setExpandedInventories(expandedInventory);
-        setBank(expandedBank);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [apiKey]);
+  const {loading, error, bank, expandedInventories, dupItems, selected, apiKey, setSelected, setApiKey} = useDedupotron();
   return (
     <div>
       <style jsx global>{`
         body {
           background-color: #262523;
-          color: #ffffff;
+          color: #F1F7ED;
           font-family: Arial, sans-serif;
+          padding-bottom: 50px;
+        }
+
+        input::placeholder {
+          color: #F1F7ED;
+        }
+
+        a {
+          color: #B33951;
         }
 
         img {
           border: none;
         }
+
+        * {
+          box-sizing: border-box;
+        }
       `}</style>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#B33951" />
         <title>
-          Dedup-o-tron | Find duplicates across your inventories and bank tabs
+          Dedupe-o-tron | Find duplicates across your inventories and bank tabs
           that you could stack.
         </title>
         <link
@@ -195,23 +105,37 @@ export default function Index() {
       <div
         style={{
           maxWidth: 590,
-          margin: "20px auto 30px auto",
+          margin: "20px auto 10px auto",
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <img src="/imgs/golem.png" style={{ height: "15vh", width: "auto" }} />
-        <div style={{ margin: 20 }}>
+        <div style={{ margin: '20px 20px 0px 20px' }}>
           <div style={{ fontSize: "2.5em", marginBottom: 10 }}>
-            Dedup-o-tron
+            🤖 Dedupe-o-tron
           </div>
           <div>
-            Find duplicates across your inventories and bank tabs that you could
-            stack.
+            Find duplicates across your Guild Wars 2 characters inventories and bank tabs that you can
+            stack to save space.
+          </div>
+          <div style={{textAlign: 'center', marginTop: '0.5em'}}>
+            Made by <a href='http://reddit.com/u/maael'>u/maael</a>
+          </div>
+          <div style={{textAlign: 'center', marginTop: '0.5em'}}>
+            <a href='https://github.com/maael/dedupotron'>GitHub</a>
           </div>
         </div>
+      </div>
+      <div style={{ maxWidth: 590, margin: "10px auto 20px auto" }}>
+        <ol>
+        <li>Open the <a href="https://account.arena.net/applications">official Guild Wars 2 API Key Management</a>.</li>
+        <li>Click on the "New Key" button.</li>
+        <li>Enter a name of your choice and check all permission checkboxes.</li>
+        <li>Copy your new API key. CTRL + C</li>
+        <li>Paste it in the form above. CTRL + V</li>
+        </ol>
       </div>
       <div style={{ maxWidth: 590, margin: "20px auto" }}>
         <input
@@ -227,15 +151,21 @@ export default function Index() {
             fontSize: "1.5em",
             textOverflow: "ellipsis",
           }}
-          placeholder="API Key"
+          placeholder="API Key..."
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
         />
       </div>
+      <div style={{height: '1em'}}>
       {loading ? (
         <div style={{ color: "#FFFFFF", textAlign: "center" }}>Loading...</div>
+      ) : error ? (
+        <div style={{ color: "#B33951", textAlign: "center" }}><ExclamatonIcon style={{height: '1em', width: '1em', display: 'inline-block', marginRight: 5, position: 'relative', top: 2}} fill={'#B33951'} />{error}</div>
       ) : null}
-      <div style={{ maxWidth: 590, margin: "0 auto", fontSize: "2em" }}>Bank</div>
+      </div>
+      <div style={{ maxWidth: 590, margin: "0 auto", fontSize: "2em" }}>
+        Bank
+      </div>
       {chunk(bank, BANK_SIZE).map((bankTab, i) => (
         <div
           key={`bank-tab-${i}`}
@@ -248,35 +178,51 @@ export default function Index() {
                 placement="bottom-start"
                 content={
                   <div
-                    style={{
-                      backgroundColor: "#000000",
-                      color: "#FFFFFF",
-                      padding: 10,
-                    }}
-                  >
-                    <div>
-                      {b.count} {b.name}
-                    </div>
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: cleanDescription(b.description),
-                      }}
-                    />
-                    {b.bound_to ? <div>Bound to: {b.bound_to}</div> : null}
+                  style={{
+                    backgroundColor: "rgba(37,48, 43, 0.8)",
+                    border: '1px solid #000000',
+                    color: "#FFFFFF",
+                    padding: 10,
+                  }}
+                >
+                  <div style={{color: rarityColors[b.rarity] || '#FFFFFF', fontWeight: 'bold', marginBottom: '0.5em'}}>
+                    {b.count} {b.name}
                   </div>
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: cleanDescription(b.description),
+                    }}
+                  />
+                  {(b.flags || []).includes('AccountBound') ? (
+                    <div style={{marginTop: '0.5em'}}>Account Bound</div>
+                  ) : null}
+                  {b.charges ? (
+                    <div style={{marginTop: '0.5em'}}>{b.charges} charges</div>
+                  ) : null}
+                  {b.bound_to ? (
+                    <div style={{marginTop: '0.5em'}}>Bound to: {b.bound_to}</div>
+                  ) : null}
+                </div>
                 }
                 disabled={!b.name}
               >
-                <img
-                  src={b.icon}
-                  onClick={() => setSelected(selected === b.id ? undefined : b.id)}
-                  style={{
-                    ...styles.icon,
-                    ...(dupItems.has(b.id) ? styles.dup : {}),
-                    ...(selected === b.id ? styles.selected : {}),
-                    ...(selected && selected !== b.id ? styles.notSelected : {})
-                  }}
-                />
+                <div style={{position: 'relative', display: 'inline-block'}}>
+                  <img
+                    src={b.icon}
+                    onClick={() =>
+                      setSelected(selected === b.id ? undefined : b.id)
+                    }
+                    style={{
+                      ...styles.icon,
+                      ...(dupItems.has(b.id) ? styles.dup : {}),
+                      ...(selected === b.id ? styles.selected : {}),
+                      ...(selected && selected !== b.id
+                        ? styles.notSelected
+                        : {}),
+                    }}
+                  />
+                  {dupItems.has(b.id) ? <ExclamatonIcon style={{position: 'absolute', right: 5, bottom: 10, width: 20, height: 20}} fill={'#B33951'} /> : null}
+                </div>
               </Tippy>
             ) : (
               <div style={styles.icon} key={`empty-${i}-${j}`} />
@@ -284,7 +230,9 @@ export default function Index() {
           )}
         </div>
       ))}
-      <div style={{ maxWidth: 590, margin: "0 auto", fontSize: "2em" }}>Inventories</div>
+      <div style={{ maxWidth: 590, margin: "0 auto", fontSize: "2em" }}>
+        Inventories
+      </div>
       <div>
         {expandedInventories.map(({ character, inventory }) => (
           <div
@@ -292,10 +240,11 @@ export default function Index() {
             style={{
               width:
                 INVENTORY_WIDTH * styles.icon.width + INVENTORY_WIDTH * 2 * 4,
+              maxWidth: '100%',
               margin: "0 auto",
             }}
           >
-            {character.name}
+            <div style={{fontSize: '1.5em', margin: '10px 0px 5px'}}>{character.name}</div>
             {inventory.map((bag, idx) =>
               bag ? (
                 <div key={`${character.name}${bag.id}${idx}`}>
@@ -304,15 +253,17 @@ export default function Index() {
                         <Tippy
                           key={idx2}
                           placement="bottom-start"
+                          animation={false}
                           content={
                             <div
                               style={{
-                                backgroundColor: "#000000",
+                                backgroundColor: "rgba(37,48, 43, 0.8)",
+                                border: '1px solid #000000',
                                 color: "#FFFFFF",
                                 padding: 10,
                               }}
                             >
-                              <div>
+                              <div style={{color: rarityColors[i.rarity] || '#FFFFFF', fontWeight: 'bold', marginBottom: '0.5em'}}>
                                 {i.count} {i.name}
                               </div>
                               <div
@@ -320,24 +271,39 @@ export default function Index() {
                                   __html: cleanDescription(i.description),
                                 }}
                               />
+                              {(i.flags || []).includes('AccountBound') ? (
+                                <div style={{marginTop: '0.5em'}}>Account Bound</div>
+                              ) : null}
+                              {i.charges ? (
+                                <div style={{marginTop: '0.5em'}}>{i.charges} charges</div>
+                              ) : null}
                               {i.bound_to ? (
-                                <div>Bound to: {i.bound_to}</div>
+                                <div style={{marginTop: '0.5em'}}>Bound to: {i.bound_to}</div>
                               ) : null}
                             </div>
                           }
                           disabled={!i.name}
                         >
                           {i && i.icon ? (
+                            <div style={{position: 'relative', display: 'inline-block'}}>
                             <img
                               src={i.icon}
-                              onClick={() => setSelected(selected === i.id ? undefined : i.id)}
+                              onClick={() =>
+                                setSelected(
+                                  selected === i.id ? undefined : i.id
+                                )
+                              }
                               style={{
                                 ...styles.icon,
                                 ...(dupItems.has(i.id) ? styles.dup : {}),
                                 ...(selected === i.id ? styles.selected : {}),
-                                ...(selected && selected !== i.id ? styles.notSelected : {})
+                                ...(selected && selected !== i.id
+                                  ? styles.notSelected
+                                  : {}),
                               }}
                             />
+                            {dupItems.has(i.id) ? <ExclamatonIcon style={{position: 'absolute', right: 5, bottom: 10, width: 20, height: 20}} fill={'#B33951'} /> : null}
+                            </div>
                           ) : (
                             <div
                               style={styles.icon}
