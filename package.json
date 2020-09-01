@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@tippyjs/react": "^4.1.0",
+    "fathom-client": "^3.0.0",
     "gw2api-client": "^7.4.1",
     "next": "^9.4.4",
     "react": "^16.13.1",

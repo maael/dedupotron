@@ -1,8 +1,9 @@
 import Head from "next/head";
 import Tippy from "@tippyjs/react";
 import ExclamatonIcon from "../components/icons/ExclamationIcon";
-import chunk from '../util/chunk';
 import useDedupotron from '../components/hooks/useDedupotron';
+import useFathom from '../components/hooks/useFathom';
+import chunk from '../util/chunk';
 
 const BANK_SIZE = 30;
 const INVENTORY_WIDTH = 10;
@@ -59,6 +60,7 @@ const styles = {
  */
 
 export default function Index() {
+  useFathom();
   const {loading, error, bank, expandedInventories, dupItems, selected, apiKey, setSelected, setApiKey} = useDedupotron();
   return (
     <div>
