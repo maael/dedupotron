@@ -5,6 +5,7 @@ import Checkbox from '../components/Checkbox';
 import useDedupotron from '../components/hooks/useDedupotron';
 import useFathom from '../components/hooks/useFathom';
 import useSearch from '../components/hooks/useSearch';
+import useSortInventories from '../components/hooks/useSortInventories';
 import useLocalstorage, {LocalStorageKeys} from '../components/hooks/useLocalstorage';
 import chunk from '../util/chunk';
 import { useState } from "react";
@@ -21,7 +22,8 @@ export default function Index() {
   const [highlightGear, setHighlightGear] = useLocalstorage(LocalStorageKeys.SETTING_HIGHLIGHT_GEAR, false);
   const {loading, error, bank, expandedInventories, dupItems, selected, apiKey, setSelected, setApiKey} = useDedupotron(highlightGear);
   const [search, setSearch] = useState('');
-  const [filteredBank, filteredInventories] = useSearch(bank, expandedInventories, search);
+  const sortedInventories = useSortInventories(selected, expandedInventories);
+  const [filteredBank, filteredInventories] = useSearch(bank, sortedInventories, search);
   return (
     <div>
       <style jsx global>{`
