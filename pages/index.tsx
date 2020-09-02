@@ -1,9 +1,11 @@
 import Head from "next/head";
 import ExclamatonIcon from "../components/icons/ExclamationIcon";
 import ItemIcon, {styles} from '../components/ItemIcon';
+import Checkbox from '../components/Checkbox';
 import useDedupotron from '../components/hooks/useDedupotron';
 import useFathom from '../components/hooks/useFathom';
 import useSearch from '../components/hooks/useSearch';
+import useLocalstorage, {LocalStorageKeys} from '../components/hooks/useLocalstorage';
 import chunk from '../util/chunk';
 import { useState } from "react";
 
@@ -16,7 +18,8 @@ const INVENTORY_WIDTH = 10;
 
 export default function Index() {
   useFathom();
-  const {loading, error, bank, expandedInventories, dupItems, selected, apiKey, setSelected, setApiKey} = useDedupotron();
+  const [highlightGear, setHighlightGear] = useLocalstorage(LocalStorageKeys.SETTING_HIGHLIGHT_GEAR, false);
+  const {loading, error, bank, expandedInventories, dupItems, selected, apiKey, setSelected, setApiKey} = useDedupotron(highlightGear);
   const [search, setSearch] = useState('');
   const [filteredBank, filteredInventories] = useSearch(bank, expandedInventories, search);
   return (
@@ -133,6 +136,9 @@ export default function Index() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+      </div>
+      <div style={{ maxWidth: 590, margin: "20px auto" }}>
+        <Checkbox value={highlightGear} setValue={setHighlightGear} label={'Highlight duplicate gear'} type='circular' />
       </div>
       <div style={{ maxWidth: 590, margin: "20px auto", textAlign: 'center', fontSize: '1.2em' }}>
         Click on any item below to highlight it and any duplicates.

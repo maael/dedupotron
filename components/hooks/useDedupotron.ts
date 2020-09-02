@@ -6,7 +6,7 @@ import useLocalstorage, { LocalStorageKeys } from './useLocalstorage';
  * TODO: Track where the dups are for easier stacking
  */
 
-export default function useDedupotron () {
+export default function useDedupotron (highlightGear: boolean) {
   const [bank, setBank] = useState([]);
   const [expandedInventories, setExpandedInventories] = useState([]);
   const [dupItems, setDupItems] = useState(new Set());
@@ -105,6 +105,9 @@ export default function useDedupotron () {
                 if (item && (item.charges || item.count >= 250 || item.type === 'Gathering' || (item.details && item.details.type === 'Salvage'))) {
                   return undefined;
                 }
+                if (!highlightGear && item && ['Weapon', 'Back', 'Armor', 'Trinket'].includes(item.type)) {
+                  return undefined;
+                }
                 return count > 1 ? parseInt(id) : undefined;
               })
               .filter(Boolean)
@@ -119,6 +122,6 @@ export default function useDedupotron () {
         setLoading(false);
       }
     })();
-  }, [apiKey]);
+  }, [apiKey, highlightGear]);
   return {loading, error, bank, expandedInventories, dupItems, selected, apiKey, setSelected, setApiKey};
 }
