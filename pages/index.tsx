@@ -161,7 +161,7 @@ export default function Index() {
           style={{ maxWidth: 590, margin: "10px auto", textAlign: "center" }}
         >
           {bankTab.map((b, j) =>
-            <ItemIcon item={b} selected={selected} setSelected={setSelected} dupItems={dupItems} key={`bank-item-${i}-${j}`} />
+            <ItemIcon item={b} selected={selected} setSelected={setSelected} dupItems={dupItems} key={`bank-item-${i}-${j}`} inventories={expandedInventories} />
           )}
         </div>
       ))}
@@ -187,7 +187,7 @@ export default function Index() {
                 <div key={`${character.name}${bag.id}${idx}`}>
                   {bag
                     ? bag.inventory.map((i, idx2) => (
-                      <ItemIcon item={i} selected={selected} setSelected={setSelected} dupItems={dupItems} key={`inv-item-${idx}-${idx2}`} />
+                      <ItemIcon item={i} selected={selected} setSelected={setSelected} dupItems={dupItems} key={`inv-item-${idx}-${idx2}`} inventories={expandedInventories} />
                     )) : null}
                 </div>
               ) : null

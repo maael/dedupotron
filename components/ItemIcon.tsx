@@ -1,5 +1,5 @@
 import Tippy from "@tippyjs/react";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import ExclamatonIcon from "../components/icons/ExclamationIcon";
 
 const descStyles = {
@@ -54,10 +54,20 @@ interface Props {
   selected: any;
   setSelected: any;
   dupItems: any;
+  inventories: any;
 }
 
-function ItemIcon({ item: b, setSelected, selected, dupItems }: Props) {
+function useDupLocations (isDup: boolean, inventories: any, id?: number) {
+  return useMemo(() => {
+    if (!isDup || !id) return [];
+    return (inventories || []).filter(({inventory}) => inventory && inventory.some((i) => i && i.inventory.some(({id: invId}) => invId === id)));
+  }, [isDup, inventories, id])
+}
+
+function ItemIcon({ item: b, setSelected, selected, dupItems, inventories }: Props) {
   const isDup = b && dupItems.has(b.id) && (!b.count || b.count < 250);
+  const dupLocations = useDupLocations(isDup, inventories, b && b.id);
+  console.info(dupLocations);
   return b && b.icon ? (
     <Tippy
       placement="bottom-start"
@@ -85,6 +95,12 @@ function ItemIcon({ item: b, setSelected, selected, dupItems }: Props) {
               __html: cleanDescription(b.description),
             }}
           />
+          {isDup && dupLocations.length > 0 ? <div style={{marginTop: "0.5em"}}>
+            Duplicated in: 
+            <ul style={{margin: 3}}>
+              {dupLocations.map(({character}) => <li key={character.name} style={{margin: 0}}>{character.name}'s Inventory</li>)}
+            </ul>
+          </div> : null}
           {(b.flags || []).includes("AccountBound") ? (
             <div style={{ marginTop: "0.5em" }}>Account Bound</div>
           ) : null}
