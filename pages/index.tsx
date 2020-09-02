@@ -152,7 +152,7 @@ export default function Index() {
         <div style={{ color: "#B33951", textAlign: "center" }}><ExclamatonIcon style={{height: '1em', width: '1em', display: 'inline-block', marginRight: 5, position: 'relative', top: 2}} fill={'#B33951'} />{error}</div>
       ) : null}
       </div>
-      <div style={{ maxWidth: 590, margin: "0 auto", fontSize: "2em" }}>
+      <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
         Bank
       </div>
       {chunk(filteredBank, BANK_SIZE).map((bankTab, i) => (
@@ -165,7 +165,7 @@ export default function Index() {
           )}
         </div>
       ))}
-      <div style={{ maxWidth: 590, margin: "0 auto", fontSize: "2em" }}>
+      <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2.5em" }}>
         Inventories
       </div>
       <div>
@@ -179,7 +179,9 @@ export default function Index() {
               margin: "0 auto",
             }}
           >
-            <div style={{fontSize: '1.5em', margin: '10px 0px 5px'}}>{character.name}</div>
+            <div style={{width: '100%', position: 'sticky', top: 0, zIndex: 99, background: '#262523', padding: 5}}>
+              <div style={{fontSize: '2em', margin: '10px 0px 5px 0px'}}>{character.name}</div>
+            </div>
             {inventory.map((bag, idx) =>
               bag ? (
                 <div key={`${character.name}${bag.id}${idx}`}>
