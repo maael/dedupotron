@@ -108,7 +108,7 @@ function ItemIcon ({item: b, setSelected, selected, dupItems}: Props) {
               : {}),
           }}
         />
-        {dupItems.has(b.id) ? <ExclamatonIcon style={{position: 'absolute', right: 5, bottom: 10, width: 20, height: 20}} fill={'#B33951'} /> : null}
+        {dupItems.has(b.id) ? <ExclamatonIcon style={{position: 'absolute', right: 5, bottom: 10, width: 20, height: 20, pointerEvents: 'none'}} fill={'#B33951'} /> : null}
       </div>
     </Tippy>
   ) : (
