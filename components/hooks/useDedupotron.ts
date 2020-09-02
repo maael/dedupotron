@@ -102,7 +102,7 @@ export default function useDedupotron () {
                 const item =
                   itemMap.get(parseInt(id, 10) as any) ||
                   inventoryItemMap.get(parseInt(id, 10) as any);
-                if (item && (item.charges || item.count >= 250)) {
+                if (item && (item.charges || item.count >= 250 || item.type === 'Gathering' || (item.details && item.details.type === 'Salvage'))) {
                   return undefined;
                 }
                 return count > 1 ? parseInt(id) : undefined;
@@ -112,7 +112,8 @@ export default function useDedupotron () {
         );
         setExpandedInventories(expandedInventory);
         setBank(expandedBank);
-      } catch {
+      } catch (e) {
+        console.error(e);
         setError(!apiKey ? 'Please provide an API key.' : 'An unexpected error occurred.')
       } finally {
         setLoading(false);
