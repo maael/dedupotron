@@ -96,7 +96,7 @@ export default function Index() {
         <ol>
         <li>Open the <a href="https://account.arena.net/applications">official Guild Wars 2 API Key Management</a>.</li>
         <li>Click on the "New Key" button.</li>
-        <li>Enter a name of your choice and check all permission checkboxes.</li>
+        <li>Enter a name of your choice and check at least the "inventories" and "characters" permission checkboxes.</li>
         <li>Copy your new API key. CTRL + C</li>
         <li>Paste it in the form above. CTRL + V</li>
         </ol>
