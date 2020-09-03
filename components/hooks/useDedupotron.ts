@@ -100,8 +100,7 @@ export default function useDedupotron (highlightGear: boolean) {
             Object.entries(localItemCountMap)
               .map(([id, count]) => {
                 const item =
-                  itemMap.get(parseInt(id, 10) as any) ||
-                  inventoryItemMap.get(parseInt(id, 10) as any);
+                  inventoryItemMap.get(parseInt(id, 10) as any) || itemMap.get(parseInt(id, 10) as any);
                 if (item && (item.charges || item.count >= 250 || item.type === 'Bag' || item.type === 'Gathering' || (item.details && item.details.type === 'Salvage'))) {
                   return undefined;
                 }

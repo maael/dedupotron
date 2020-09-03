@@ -112,6 +112,9 @@ function ItemIcon({ item: b, setSelected, selected, dupItems, inventories, onlyD
           {b.bound_to ? (
             <div style={{ marginTop: "0.5em" }}>Bound to: {b.bound_to}</div>
           ) : null}
+          {b.id ? (
+            <div style={{ marginTop: "0.5em", textAlign: 'right', opacity: 0.5 }}>ID: {b.id}</div>
+          ) : null}
         </div>
       }
       disabled={!b.name}
