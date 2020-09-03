@@ -177,32 +177,32 @@ export default function Index() {
       </div>
       {showGuilds ? (
         <>
-        <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
-          Guild Banks
-        </div>
-        <div style={{height: '1.5em'}}>
-          {loadingGuilds ? (<div style={{ color: "#FFFFFF", textAlign: "center" }}>Loading guild info...</div>) : errorGuilds ? (
-            <div style={{ color: "#B33951", textAlign: "center", textTransform: 'capitalize' }}><ExclamatonIcon style={{height: '1em', width: '1em', display: 'inline-block', marginRight: 5, position: 'relative', top: 2}} fill={'#B33951'} />{errorGuilds}</div>
-          ) : null}
-        </div>
-        {filteredGuildStashes.map(({id, name, stash}) => (
-          <div key={id}>
-            <div key={id} style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
-              {name}
-            </div>
-            {stash.map((container, i) => (
-              <div
-                key={`guild-bank-tab-${i}`}
-                style={{ maxWidth: 590, margin: "10px auto", textAlign: "center" }}
-              >
-                <div style={{fontSize: '1.2em', textAlign: 'left', textIndent: 15, marginBottom: '0.3em'}}>
-                  {container.note}
-                </div>
-                {container.inventory.map((item, j) => <ItemIcon item={item} selected={selected} setSelected={setSelected} dupItems={dupItems} key={`guild-bank-item-${id}-${i}-${j}`} inventories={expandedInventories} onlyDuplicates={onlyDuplicates} compact={compact} />)}
-              </div>
-            ))}
+          <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
+            Guild Banks
           </div>
-        ))}
+          <div style={{height: '1.5em'}}>
+            {loadingGuilds ? (<div style={{ color: "#FFFFFF", textAlign: "center" }}>Loading guild info...</div>) : errorGuilds ? (
+              <div style={{ color: "#B33951", textAlign: "center", textTransform: 'capitalize' }}><ExclamatonIcon style={{height: '1em', width: '1em', display: 'inline-block', marginRight: 5, position: 'relative', top: 2}} fill={'#B33951'} />{errorGuilds}</div>
+            ) : null}
+          </div>
+          {filteredGuildStashes.map(({id, name, stash}) => (
+            <div key={id}>
+              <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
+                {name}
+              </div>
+              {stash.map((container, i) => (
+                <div
+                  key={`guild-bank-tab-${id}-${i}`}
+                  style={{ maxWidth: 590, margin: "10px auto", textAlign: "center" }}
+                >
+                  <div style={{fontSize: '1.2em', textAlign: 'left', textIndent: 15, marginBottom: '0.3em'}}>
+                    {container.note}
+                  </div>
+                  {container.inventory.map((item, j) => <ItemIcon item={item} selected={selected} setSelected={setSelected} dupItems={dupItems} key={`guild-bank-item-${id}-${i}-${j}`} inventories={expandedInventories} onlyDuplicates={onlyDuplicates} compact={compact} />)}
+                </div>
+              ))}
+            </div>
+          ))}
         </>
       )  : null}
       <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
