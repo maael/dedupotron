@@ -51,10 +51,11 @@ export const styles = {
 
 interface Props {
   item: any;
-  selected: any;
+  selected: number;
   setSelected: any;
   dupItems: any;
   inventories: any;
+  onlyDuplicates: boolean;
 }
 
 function useDupLocations (isDup: boolean, inventories: any, id?: number) {
@@ -64,10 +65,10 @@ function useDupLocations (isDup: boolean, inventories: any, id?: number) {
   }, [isDup, inventories, id])
 }
 
-function ItemIcon({ item: b, setSelected, selected, dupItems, inventories }: Props) {
+function ItemIcon({ item: b, setSelected, selected, dupItems, inventories, onlyDuplicates }: Props) {
   const isDup = b && dupItems.has(b.id) && (!b.count || b.count < 250);
   const dupLocations = useDupLocations(isDup, inventories, b && b.id);
-  console.info(dupLocations);
+  if (!isDup && onlyDuplicates || (isDup && onlyDuplicates && (!b || !b.icon))) return null;
   return b && b.icon ? (
     <Tippy
       placement="bottom-start"
@@ -96,7 +97,7 @@ function ItemIcon({ item: b, setSelected, selected, dupItems, inventories }: Pro
             }}
           />
           {isDup && dupLocations.length > 0 ? <div style={{marginTop: "0.5em"}}>
-            Duplicated in: 
+            Duplicated in:
             <ul style={{margin: 3}}>
               {dupLocations.map(({character}) => <li key={character.name} style={{margin: 0}}>{character.name}'s Inventory</li>)}
             </ul>
