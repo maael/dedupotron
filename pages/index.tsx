@@ -22,7 +22,7 @@ const INVENTORY_WIDTH = 10;
 export default function Index() {
   useFathom();
   const [apiKey, setApiKey] = useLocalstorage(LocalStorageKeys.API_KEY, "");
-  const [showGuilds, setShowGuilds] = useLocalstorage(LocalStorageKeys.SETTING_HIGHLIGHT_GEAR, false);
+  const [showGuilds, setShowGuilds] = useLocalstorage(LocalStorageKeys.SETTING_SHOW_GUILDS, false);
   const [highlightGear, setHighlightGear] = useLocalstorage(LocalStorageKeys.SETTING_HIGHLIGHT_GEAR, false);
   const [onlyDuplicates, setOnlyDuplicates] = useLocalstorage(LocalStorageKeys.SETTING_ONLY_DUPLICATES, false);
   const [compact, setCompact] = useLocalstorage(LocalStorageKeys.SETTING_COMPACT, false);
@@ -175,7 +175,7 @@ export default function Index() {
         <div style={{ color: "#B33951", textAlign: "center" }}><ExclamatonIcon style={{height: '1em', width: '1em', display: 'inline-block', marginRight: 5, position: 'relative', top: 2}} fill={'#B33951'} />{error}</div>
       ) : null}
       </div>
-      {showGuilds ? (
+      {(guildStashes.length !== 0 || loadingGuilds) && showGuilds ? (
         <>
           <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
             Guild Banks
@@ -205,7 +205,7 @@ export default function Index() {
           ))}
         </>
       )  : null}
-      <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
+      <div key='banktitle' style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
         Bank
       </div>
       {chunk(filteredBank, BANK_SIZE).map((bankTab, i) => (
