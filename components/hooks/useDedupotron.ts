@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import client from "gw2api-client";
-import useLocalstorage, { LocalStorageKeys } from "./useLocalstorage";
+import {GuildItem} from './useGuilds';
 
 /**
  * TODO: Track where the dups are for easier stacking
  */
 
-export default function useDedupotron(highlightGear: boolean) {
+export default function useDedupotron(apiKey: string, highlightGear: boolean, guildStashes: GuildItem[]) {
   const [bank, setBank] = useState([]);
   const [expandedInventories, setExpandedInventories] = useState([]);
   const [dupItems, setDupItems] = useState(new Set());
-  const [apiKey, setApiKey] = useLocalstorage(LocalStorageKeys.API_KEY, "");
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState();
   const [error, setError] = useState<string>();
@@ -65,20 +64,6 @@ export default function useDedupotron(highlightGear: boolean) {
             })
           )
           .filter(Boolean);
-        const checkedInventoryItemIds = inventories
-          .flatMap(({ inventory }) => inventory)
-          .filter(Boolean)
-          .flatMap(({ inventory }) =>
-            inventory.map((item) => {
-              return item && item.count <= 250 && item.binding !== "Character"
-                ? `${item.id}:${item.binding || ""}`
-                : null;
-            })
-          )
-          .filter(Boolean);
-        checkedInventoryItemIds.forEach((id) => {
-          localItemCountMap[id] = (localItemCountMap[id] || 0) + 1;
-        });
         const inventoryItems = await api.items().many(allInventoryItemIds);
         const inventoryItemMap = new Map<string, object>(
           inventoryItems.map((item) => [item.id, item])
@@ -99,6 +84,21 @@ export default function useDedupotron(highlightGear: boolean) {
               : i2
           ),
         }));
+        const checkedInventoryItemIds = inventories
+          .flatMap(({ inventory }) => inventory)
+          .concat(guildStashes.flatMap((s) => s.stash))
+          .filter(Boolean)
+          .flatMap(({ inventory }) =>
+            inventory.map((item) => {
+              return item && item.count <= 250 && item.binding !== "Character"
+                ? `${item.id}:${item.binding || ""}`
+                : null;
+            })
+          )
+          .filter(Boolean);
+        checkedInventoryItemIds.forEach((id) => {
+          localItemCountMap[id] = (localItemCountMap[id] || 0) + 1;
+        });
         setDupItems(
           new Set(
             Object.entries(localItemCountMap)
@@ -141,7 +141,7 @@ export default function useDedupotron(highlightGear: boolean) {
         setLoading(false);
       }
     })();
-  }, [apiKey, highlightGear]);
+  }, [apiKey, highlightGear, guildStashes]);
   return {
     loading,
     error,
@@ -149,8 +149,6 @@ export default function useDedupotron(highlightGear: boolean) {
     expandedInventories,
     dupItems,
     selected,
-    apiKey,
     setSelected,
-    setApiKey,
   };
 }

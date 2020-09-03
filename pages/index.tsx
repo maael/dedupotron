@@ -10,6 +10,7 @@ import useSortInventories from '../components/hooks/useSortInventories';
 import useLocalstorage, {LocalStorageKeys} from '../components/hooks/useLocalstorage';
 import chunk from '../util/chunk';
 import { useState } from "react";
+import useGuilds from "../components/hooks/useGuilds";
 
 const BANK_SIZE = 30;
 const INVENTORY_WIDTH = 10;
@@ -20,13 +21,16 @@ const INVENTORY_WIDTH = 10;
 
 export default function Index() {
   useFathom();
+  const [apiKey, setApiKey] = useLocalstorage(LocalStorageKeys.API_KEY, "");
+  const [showGuilds, setShowGuilds] = useLocalstorage(LocalStorageKeys.SETTING_HIGHLIGHT_GEAR, false);
   const [highlightGear, setHighlightGear] = useLocalstorage(LocalStorageKeys.SETTING_HIGHLIGHT_GEAR, false);
   const [onlyDuplicates, setOnlyDuplicates] = useLocalstorage(LocalStorageKeys.SETTING_ONLY_DUPLICATES, false);
   const [compact, setCompact] = useLocalstorage(LocalStorageKeys.SETTING_COMPACT, false);
-  const {loading, error, bank, expandedInventories, dupItems, selected, apiKey, setSelected, setApiKey} = useDedupotron(highlightGear);
+  const {loading: loadingGuilds, error: errorGuilds, result: guildStashes} = useGuilds(apiKey, showGuilds);
+  const {loading, error, bank, expandedInventories, dupItems, selected, setSelected} = useDedupotron(apiKey, highlightGear, guildStashes);
   const [search, setSearch] = useState('');
   const sortedInventories = useSortInventories(selected, expandedInventories);
-  const [filteredBank, filteredInventories] = useSearch(bank, sortedInventories, search);
+  const [filteredBank, filteredInventories, filteredGuildStashes] = useSearch(bank, sortedInventories, guildStashes, search);
   return (
     <div>
       <style jsx global>{`
@@ -159,17 +163,48 @@ export default function Index() {
         <Checkbox value={onlyDuplicates} style={{marginBottom: 10}} setValue={setOnlyDuplicates} label={'Only show duplicates'} type='circular' />
         <Checkbox value={compact} style={{marginBottom: 10}} setValue={setCompact} label={'Compact'} type='circular' />
         <Checkbox value={highlightGear} style={{marginBottom: 10}} setValue={setHighlightGear} label={'Highlight gear'} type='circular' />
+        <Checkbox value={showGuilds} style={{marginBottom: 10}} setValue={setShowGuilds} label={'Show guilds'} type='circular' />
       </div>
       <div style={{ maxWidth: 590, margin: "20px auto", textAlign: 'center', fontSize: '1.2em' }}>
         Click on any item below to highlight it and any duplicates.
       </div>
-      <div style={{height: '1em'}}>
+      <div style={{height: '1.5em'}}>
       {loading ? (
         <div style={{ color: "#FFFFFF", textAlign: "center" }}>Loading...</div>
       ) : error ? (
         <div style={{ color: "#B33951", textAlign: "center" }}><ExclamatonIcon style={{height: '1em', width: '1em', display: 'inline-block', marginRight: 5, position: 'relative', top: 2}} fill={'#B33951'} />{error}</div>
       ) : null}
       </div>
+      {showGuilds ? (
+        <>
+        <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
+          Guild Banks
+        </div>
+        <div style={{height: '1.5em'}}>
+          {loadingGuilds ? (<div style={{ color: "#FFFFFF", textAlign: "center" }}>Loading guild info...</div>) : errorGuilds ? (
+            <div style={{ color: "#B33951", textAlign: "center", textTransform: 'capitalize' }}><ExclamatonIcon style={{height: '1em', width: '1em', display: 'inline-block', marginRight: 5, position: 'relative', top: 2}} fill={'#B33951'} />{errorGuilds}</div>
+          ) : null}
+        </div>
+        {filteredGuildStashes.map(({id, name, stash}) => (
+          <div key={id}>
+            <div key={id} style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
+              {name}
+            </div>
+            {stash.map((container, i) => (
+              <div
+                key={`guild-bank-tab-${i}`}
+                style={{ maxWidth: 590, margin: "10px auto", textAlign: "center" }}
+              >
+                <div style={{fontSize: '1.2em', textAlign: 'left', textIndent: 15, marginBottom: '0.3em'}}>
+                  {container.note}
+                </div>
+                {container.inventory.map((item, j) => <ItemIcon item={item} selected={selected} setSelected={setSelected} dupItems={dupItems} key={`guild-bank-item-${id}-${i}-${j}`} inventories={expandedInventories} onlyDuplicates={onlyDuplicates} compact={compact} />)}
+              </div>
+            ))}
+          </div>
+        ))}
+        </>
+      )  : null}
       <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
         Bank
       </div>
