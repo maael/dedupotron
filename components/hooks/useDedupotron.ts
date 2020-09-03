@@ -21,7 +21,10 @@ export default function useDedupotron (highlightGear: boolean) {
       try {
         const api = client().authenticate(apiKey);
         const localItemCountMap = {};
-        const bank = await api.account().bank().get();
+        const [bank, characters] = await Promise.all([
+          api.account().bank().get(),
+          api.characters().all()
+        ]);
         const allItemIds = bank
           .map((item) => {
             return item ? item.id : null;
@@ -37,7 +40,13 @@ export default function useDedupotron (highlightGear: boolean) {
         checkedItemIds.forEach((id) => {
           localItemCountMap[id] = (localItemCountMap[id] || 0) + 1;
         });
-        const items = await api.items().many(allItemIds);
+        const [items, inventories] = await Promise.all([
+          api.items().many(allItemIds),
+          Promise.all(          characters.map(async (c) => ({
+            inventory: await api.characters(c.name).inventory().get(),
+            character: c,
+          })))
+        ]);
         const itemMap = new Map<string, any>(
           items.map((item) => [item.id, item])
         );
@@ -45,13 +54,6 @@ export default function useDedupotron (highlightGear: boolean) {
           ...item,
           ...(item && itemMap.has(item.id) ? itemMap.get(item.id) : {}),
         }));
-        const characters = await api.characters().all();
-        const inventories = await Promise.all(
-          characters.map(async (c) => ({
-            inventory: await api.characters(c.name).inventory().get(),
-            character: c,
-          }))
-        );
         const allInventoryItemIds = inventories
           .flatMap(({ inventory }) => inventory)
           .filter(Boolean)
