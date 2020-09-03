@@ -56,6 +56,7 @@ interface Props {
   dupItems: any;
   inventories: any;
   onlyDuplicates: boolean;
+  compact: boolean;
 }
 
 function useDupLocations (isDup: boolean, inventories: any, id?: number) {
@@ -65,7 +66,7 @@ function useDupLocations (isDup: boolean, inventories: any, id?: number) {
   }, [isDup, inventories, id])
 }
 
-function ItemIcon({ item: b, setSelected, selected, dupItems, inventories, onlyDuplicates }: Props) {
+function ItemIcon({ item: b, setSelected, selected, dupItems, inventories, onlyDuplicates, compact }: Props) {
   const isDup = b && dupItems.has(b.id) && (!b.count || b.count < 250);
   const dupLocations = useDupLocations(isDup, inventories, b && b.id);
   if (!isDup && onlyDuplicates || (isDup && onlyDuplicates && (!b || !b.icon))) return null;
@@ -142,7 +143,7 @@ function ItemIcon({ item: b, setSelected, selected, dupItems, inventories, onlyD
         ) : null}
       </div>
     </Tippy>
-  ) : (
+  ) : compact ? null : (
     <div style={styles.icon} />
   );
 }

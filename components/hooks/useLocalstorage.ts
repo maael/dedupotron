@@ -3,7 +3,8 @@ import {Dispatch, SetStateAction, useState} from 'react';
 export enum LocalStorageKeys {
   API_KEY = 'DEDUPOTRON_API_KEY',
   SETTING_HIGHLIGHT_GEAR = 'DEDUPOTRON_SETTING_HIGHLIGHT_GEAR',
-  SETTING_ONLY_DUPLICATES = 'DEDUPOTRON_SETTING_ONLY_DUPLICATES'
+  SETTING_ONLY_DUPLICATES = 'DEDUPOTRON_SETTING_ONLY_DUPLICATES',
+  SETTING_COMPACT = 'DEDUPOTRON_SETTING_COMPACT'
 }
 
 export default function useLocalStorage<T>(key: LocalStorageKeys, initialValue: T) {

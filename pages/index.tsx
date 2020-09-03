@@ -21,6 +21,7 @@ export default function Index() {
   useFathom();
   const [highlightGear, setHighlightGear] = useLocalstorage(LocalStorageKeys.SETTING_HIGHLIGHT_GEAR, false);
   const [onlyDuplicates, setOnlyDuplicates] = useLocalstorage(LocalStorageKeys.SETTING_ONLY_DUPLICATES, false);
+  const [compact, setCompact] = useLocalstorage(LocalStorageKeys.SETTING_COMPACT, false);
   const {loading, error, bank, expandedInventories, dupItems, selected, apiKey, setSelected, setApiKey} = useDedupotron(highlightGear);
   const [search, setSearch] = useState('');
   const sortedInventories = useSortInventories(selected, expandedInventories);
@@ -142,6 +143,7 @@ export default function Index() {
       </div>
       <div style={{ maxWidth: 590, margin: "20px auto", display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
         <Checkbox value={onlyDuplicates} style={{marginBottom: 10}} setValue={setOnlyDuplicates} label={'Only show duplicates'} type='circular' />
+        <Checkbox value={compact} style={{marginBottom: 10}} setValue={setCompact} label={'Compact'} type='circular' />
         <Checkbox value={highlightGear} style={{marginBottom: 10}} setValue={setHighlightGear} label={'Highlight gear'} type='circular' />
       </div>
       <div style={{ maxWidth: 590, margin: "20px auto", textAlign: 'center', fontSize: '1.2em' }}>
@@ -163,7 +165,7 @@ export default function Index() {
           style={{ maxWidth: 590, margin: "10px auto", textAlign: "center" }}
         >
           {bankTab.map((b, j) =>
-            <ItemIcon item={b} selected={selected} setSelected={setSelected} dupItems={dupItems} key={`bank-item-${i}-${j}`} inventories={expandedInventories} onlyDuplicates={onlyDuplicates} />
+            <ItemIcon item={b} selected={selected} setSelected={setSelected} dupItems={dupItems} key={`bank-item-${i}-${j}`} inventories={expandedInventories} onlyDuplicates={onlyDuplicates} compact={compact} />
           )}
         </div>
       ))}
@@ -189,7 +191,7 @@ export default function Index() {
                 <div key={`${character.name}${bag.id}${idx}`}>
                   {bag
                     ? bag.inventory.map((i, idx2) => (
-                      <ItemIcon item={i} selected={selected} setSelected={setSelected} dupItems={dupItems} key={`inv-item-${idx}-${idx2}`} inventories={expandedInventories} onlyDuplicates={onlyDuplicates} />
+                      <ItemIcon item={i} selected={selected} setSelected={setSelected} dupItems={dupItems} key={`inv-item-${idx}-${idx2}`} inventories={expandedInventories} onlyDuplicates={onlyDuplicates} compact={compact} />
                     )) : null}
                 </div>
               ) : null
