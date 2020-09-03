@@ -66,7 +66,7 @@ export default function useDedupotron (highlightGear: boolean) {
           .filter(Boolean)
           .flatMap(({ inventory }) =>
             inventory.map((item) => {
-              return item && item.count < 250 && item.binding !== "Character"
+              return item && item.count <= 250 && item.binding !== "Character"
                 ? item.id
                 : null;
             })
@@ -102,7 +102,7 @@ export default function useDedupotron (highlightGear: boolean) {
                 const item =
                   itemMap.get(parseInt(id, 10) as any) ||
                   inventoryItemMap.get(parseInt(id, 10) as any);
-                if (item && (item.charges || item.count >= 250 || item.type === 'Gathering' || (item.details && item.details.type === 'Salvage'))) {
+                if (item && (item.charges || item.count >= 250 || item.type === 'Bag' || item.type === 'Gathering' || (item.details && item.details.type === 'Salvage'))) {
                   return undefined;
                 }
                 if (!highlightGear && item && ['Weapon', 'Back', 'Armor', 'Trinket'].includes(item.type)) {
