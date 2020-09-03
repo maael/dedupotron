@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import client from "gw2api-client";
-import useLocalstorage, { LocalStorageKeys } from './useLocalstorage';
+import useLocalstorage, { LocalStorageKeys } from "./useLocalstorage";
 
 /**
  * TODO: Track where the dups are for easier stacking
  */
 
-export default function useDedupotron (highlightGear: boolean) {
+export default function useDedupotron(highlightGear: boolean) {
   const [bank, setBank] = useState([]);
   const [expandedInventories, setExpandedInventories] = useState([]);
   const [dupItems, setDupItems] = useState(new Set());
-  const [apiKey, setApiKey] = useLocalstorage(LocalStorageKeys.API_KEY, '');
+  const [apiKey, setApiKey] = useLocalstorage(LocalStorageKeys.API_KEY, "");
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState();
   const [error, setError] = useState<string>();
@@ -23,7 +23,7 @@ export default function useDedupotron (highlightGear: boolean) {
         const localItemCountMap = {};
         const [bank, characters] = await Promise.all([
           api.account().bank().get(),
-          api.characters().all()
+          api.characters().all(),
         ]);
         const allItemIds = bank
           .map((item) => {
@@ -33,7 +33,7 @@ export default function useDedupotron (highlightGear: boolean) {
         const checkedItemIds = bank
           .map((item) => {
             return item && item.count < 250 && item.binding !== "Character"
-              ? `${item.id}:${item.binding || ''}`
+              ? `${item.id}:${item.binding || ""}`
               : null;
           })
           .filter(Boolean);
@@ -42,10 +42,12 @@ export default function useDedupotron (highlightGear: boolean) {
         });
         const [items, inventories] = await Promise.all([
           api.items().many(allItemIds),
-          Promise.all(          characters.map(async (c) => ({
-            inventory: await api.characters(c.name).inventory().get(),
-            character: c,
-          })))
+          Promise.all(
+            characters.map(async (c) => ({
+              inventory: await api.characters(c.name).inventory().get(),
+              character: c,
+            }))
+          ),
         ]);
         const itemMap = new Map<string, any>(
           items.map((item) => [item.id, item])
@@ -69,7 +71,7 @@ export default function useDedupotron (highlightGear: boolean) {
           .flatMap(({ inventory }) =>
             inventory.map((item) => {
               return item && item.count <= 250 && item.binding !== "Character"
-                ? `${item.id}:${item.binding || ''}`
+                ? `${item.id}:${item.binding || ""}`
                 : null;
             })
           )
@@ -101,13 +103,24 @@ export default function useDedupotron (highlightGear: boolean) {
           new Set(
             Object.entries(localItemCountMap)
               .map(([id, count]) => {
-                const numericId = parseInt(id.split(':')[0], 10) as any;
+                const numericId = parseInt(id.split(":")[0], 10) as any;
                 const item =
                   inventoryItemMap.get(numericId) || itemMap.get(numericId);
-                if (item && (item.charges || item.count >= 250 || item.type === 'Bag' || item.type === 'Gathering' || (item.details && item.details.type === 'Salvage'))) {
+                if (
+                  item &&
+                  (item.charges ||
+                    item.count >= 250 ||
+                    item.type === "Bag" ||
+                    item.type === "Gathering" ||
+                    (item.details && item.details.type === "Salvage"))
+                ) {
                   return undefined;
                 }
-                if (!highlightGear && item && ['Weapon', 'Back', 'Armor', 'Trinket'].includes(item.type)) {
+                if (
+                  !highlightGear &&
+                  item &&
+                  ["Weapon", "Back", "Armor", "Trinket"].includes(item.type)
+                ) {
                   return undefined;
                 }
                 return count > 1 ? numericId : undefined;
@@ -119,11 +132,25 @@ export default function useDedupotron (highlightGear: boolean) {
         setBank(expandedBank);
       } catch (e) {
         console.error(e);
-        setError(!apiKey ? 'Please provide an API key.' : 'An unexpected error occurred.')
+        setError(
+          !apiKey
+            ? "Please provide an API key."
+            : "An unexpected error occurred."
+        );
       } finally {
         setLoading(false);
       }
     })();
   }, [apiKey, highlightGear]);
-  return {loading, error, bank, expandedInventories, dupItems, selected, apiKey, setSelected, setApiKey};
+  return {
+    loading,
+    error,
+    bank,
+    expandedInventories,
+    dupItems,
+    selected,
+    apiKey,
+    setSelected,
+    setApiKey,
+  };
 }
