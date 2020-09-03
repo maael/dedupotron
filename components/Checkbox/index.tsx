@@ -17,11 +17,13 @@ export default function Checkbox({
 }) {
   return (
     <div className={styles.checkboxContainer} style={style}>
-      <label className={styles.checkboxLabel}>
-        <input type="checkbox" checked={value} onChange={() => setValue(!value)} />
-        <span className={classnames(styles.checkboxCustom, styles[type])} />
+      <label className={styles.checkboxLabelOuter}>
+        <span className={styles.checkboxLabel}>
+          <input type="checkbox" checked={value} onChange={() => setValue(!value)} />
+          <span className={classnames(styles.checkboxCustom, styles[type])} />
+        </span>
+        <div className={styles.inputTitle}>{label}</div>
       </label>
-      <div className={styles.inputTitle}>{label}</div>
     </div>
   );
 }
