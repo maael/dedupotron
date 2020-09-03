@@ -1,4 +1,5 @@
 import Head from "next/head";
+import {FiGithub, FiHeart, FiCoffee} from 'react-icons/fi';
 import ExclamatonIcon from "../components/icons/ExclamationIcon";
 import ItemIcon, {styles} from '../components/ItemIcon';
 import Checkbox from '../components/Checkbox';
@@ -89,8 +90,21 @@ export default function Index() {
           <div style={{textAlign: 'center', marginTop: '0.5em'}}>
             Made by <a href='http://reddit.com/u/maael'>u/maael</a>
           </div>
-          <div style={{textAlign: 'center', marginTop: '0.5em'}}>
-            <a href='https://github.com/maael/dedupotron'>GitHub</a>
+          <div style={{textAlign: 'center', marginTop: '0.6em', fontSize: '0.9em'}}>
+            Code here:{' '}
+            <a href='https://github.com/maael/dedupotron'>
+              <FiGithub style={{position: 'relative', top: 2}} />
+            </a>
+          </div>
+          <div style={{textAlign: 'center', marginTop: '0.5em', fontSize: '0.8em', opacity: 0.7}}>
+            Like the site? Sponsor me on GitHub{' '}
+            <a href='https://github.com/sponsors/maael'>
+              <FiHeart style={{position: 'relative', top: 2}} />
+            </a>
+            {' '}or buy me a {' '}
+            <a href='https://www.buymeacoffee.com/matte'>
+              <FiCoffee style={{position: 'relative', top: 2}} />
+            </a>
           </div>
         </div>
       </div>

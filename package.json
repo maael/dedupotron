@@ -17,7 +17,8 @@
     "gw2api-client": "^7.4.1",
     "next": "^9.4.4",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "react-icons": "^3.11.0"
   },
   "devDependencies": {
     "@types/node": "^14.0.19",
