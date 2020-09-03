@@ -30,7 +30,7 @@ export default function useDedupotron (highlightGear: boolean) {
         const checkedItemIds = bank
           .map((item) => {
             return item && item.count < 250 && item.binding !== "Character"
-              ? item.id
+              ? `${item.id}:${item.binding || ''}`
               : null;
           })
           .filter(Boolean);
@@ -67,7 +67,7 @@ export default function useDedupotron (highlightGear: boolean) {
           .flatMap(({ inventory }) =>
             inventory.map((item) => {
               return item && item.count <= 250 && item.binding !== "Character"
-                ? item.id
+                ? `${item.id}:${item.binding || ''}`
                 : null;
             })
           )
@@ -99,15 +99,16 @@ export default function useDedupotron (highlightGear: boolean) {
           new Set(
             Object.entries(localItemCountMap)
               .map(([id, count]) => {
+                const numericId = parseInt(id.split(':')[0], 10) as any;
                 const item =
-                  inventoryItemMap.get(parseInt(id, 10) as any) || itemMap.get(parseInt(id, 10) as any);
+                  inventoryItemMap.get(numericId) || itemMap.get(numericId);
                 if (item && (item.charges || item.count >= 250 || item.type === 'Bag' || item.type === 'Gathering' || (item.details && item.details.type === 'Salvage'))) {
                   return undefined;
                 }
                 if (!highlightGear && item && ['Weapon', 'Back', 'Armor', 'Trinket'].includes(item.type)) {
                   return undefined;
                 }
-                return count > 1 ? parseInt(id) : undefined;
+                return count > 1 ? numericId : undefined;
               })
               .filter(Boolean)
           )
