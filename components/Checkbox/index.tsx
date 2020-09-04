@@ -1,17 +1,17 @@
-import { CSSProperties } from 'react';
-import classnames from 'classnames';
-import styles from './styles.module.css';
+import { CSSProperties } from 'react'
+import classnames from 'classnames'
+import styles from './styles.module.css'
 
 export default function Checkbox({
   type = 'rectangular',
   value,
   setValue,
   label,
-  style
+  style,
 }: {
-  type?: "rectangular" | "circular";
-  value: boolean;
-  setValue: (newValue: boolean) => void;
+  type?: 'rectangular' | 'circular'
+  value: boolean
+  setValue: (newValue: boolean) => void
   label: string
   style?: CSSProperties
 }) {
@@ -25,5 +25,5 @@ export default function Checkbox({
         <div className={styles.inputTitle}>{label}</div>
       </label>
     </div>
-  );
+  )
 }
