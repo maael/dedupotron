@@ -1,5 +1,6 @@
 import Head from "next/head";
-import {FiGithub, FiHeart, FiCoffee} from 'react-icons/fi';
+import { PropsWithChildren, useState } from "react";
+import {FiGithub, FiHeart, FiCoffee, FiPlus, FiMinus} from 'react-icons/fi';
 import ExclamatonIcon from "../components/icons/ExclamationIcon";
 import ItemIcon, {styles} from '../components/ItemIcon';
 import Checkbox from '../components/Checkbox';
@@ -9,7 +10,6 @@ import useSearch from '../components/hooks/useSearch';
 import useSortInventories from '../components/hooks/useSortInventories';
 import useLocalstorage, {LocalStorageKeys} from '../components/hooks/useLocalstorage';
 import chunk from '../util/chunk';
-import { useState } from "react";
 import useGuilds from "../components/hooks/useGuilds";
 
 const BANK_SIZE = 30;
@@ -19,9 +19,25 @@ const INVENTORY_WIDTH = 10;
  * TODO: Track where the dups are for easier stacking
  */
 
+function ToggleCollapsedSection ({collapsed, setCollapsed, section}: {collapsed: string[], setCollapsed: any, section: string}) {
+  const isCollapsed = collapsed.includes(section);
+  const Icon = isCollapsed ? FiPlus : FiMinus;
+  return (
+    <>
+      <div style={{flex: 1}} />
+      <Icon style={{justifySelf: 'flex-end', cursor: 'pointer'}} size={30} onClick={() => setCollapsed(isCollapsed ? collapsed.filter((c) => c !== section) : collapsed.concat(section))} />
+    </>
+  )
+}
+
+function CollapseableSection ({collapsed, section, children}: PropsWithChildren<{section: string, collapsed: string[]}>) {
+  return collapsed.includes(section) ? null : <>{children}</>;
+}
+
 export default function Index() {
   useFathom();
   const [apiKey, setApiKey] = useLocalstorage(LocalStorageKeys.API_KEY, "");
+  const [collapsedSections, setCollapsedSections] = useLocalstorage<string[]>(LocalStorageKeys.SETTING_COLLAPSED_SECTIONS, [])
   const [showGuilds, setShowGuilds] = useLocalstorage(LocalStorageKeys.SETTING_SHOW_GUILDS, false);
   const [highlightGear, setHighlightGear] = useLocalstorage(LocalStorageKeys.SETTING_HIGHLIGHT_GEAR, false);
   const [onlyDuplicates, setOnlyDuplicates] = useLocalstorage(LocalStorageKeys.SETTING_ONLY_DUPLICATES, false);
@@ -177,9 +193,10 @@ export default function Index() {
       </div>
       {(guildStashes.length !== 0 || loadingGuilds) && showGuilds ? (
         <>
-          <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
-            Guild Banks
+          <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523', display: 'flex' }}>
+            Guild Banks <ToggleCollapsedSection collapsed={collapsedSections} setCollapsed={setCollapsedSections} section='Guild Banks' />
           </div>
+          <CollapseableSection collapsed={collapsedSections} section='Guild Banks'>
           <div style={{height: '1.5em'}}>
             {loadingGuilds ? (<div style={{ color: "#FFFFFF", textAlign: "center" }}>Loading guild info...</div>) : errorGuilds ? (
               <div style={{ color: "#B33951", textAlign: "center", textTransform: 'capitalize' }}><ExclamatonIcon style={{height: '1em', width: '1em', display: 'inline-block', marginRight: 5, position: 'relative', top: 2}} fill={'#B33951'} />{errorGuilds}</div>
@@ -187,9 +204,10 @@ export default function Index() {
           </div>
           {filteredGuildStashes.map(({id, name, stash}) => (
             <div key={id}>
-              <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
-                {name}
+              <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523', display: 'flex' }}>
+                {name} <ToggleCollapsedSection collapsed={collapsedSections} setCollapsed={setCollapsedSections} section={`GB-${name}`} />
               </div>
+              <CollapseableSection collapsed={collapsedSections} section={`GB-${name}`}>
               {stash.map((container, i) => (
                 <div
                   key={`guild-bank-tab-${id}-${i}`}
@@ -201,13 +219,16 @@ export default function Index() {
                   {container.inventory.map((item, j) => <ItemIcon item={item} selected={selected} setSelected={setSelected} dupItems={dupItems} key={`guild-bank-item-${id}-${i}-${j}`} inventories={expandedInventories} onlyDuplicates={onlyDuplicates} compact={compact} />)}
                 </div>
               ))}
+              </CollapseableSection>
             </div>
           ))}
+          </CollapseableSection>
         </>
       )  : null}
-      <div key='banktitle' style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523' }}>
-        Bank
+      <div key='banktitle' style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2em", position: 'sticky', top: 0, zIndex: 99, background: '#262523', display: 'flex', alignItems: 'center' }}>
+        Bank <ToggleCollapsedSection collapsed={collapsedSections} setCollapsed={setCollapsedSections} section='Bank' />
       </div>
+      <CollapseableSection collapsed={collapsedSections} section='Bank'>
       {chunk(filteredBank, BANK_SIZE).map((bankTab, i) => (
         <div
           key={`bank-tab-${i}`}
@@ -218,9 +239,11 @@ export default function Index() {
           )}
         </div>
       ))}
-      <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2.5em" }}>
-        Inventories
+      </CollapseableSection>
+      <div style={{ maxWidth: 590, margin: "0px auto", textIndent: 5, fontSize: "2.5em", display: 'flex', alignItems: 'center' }}>
+        Inventories <ToggleCollapsedSection collapsed={collapsedSections} setCollapsed={setCollapsedSections} section='Inventories' />
       </div>
+      <CollapseableSection collapsed={collapsedSections} section='Inventories'>
       <div>
         {filteredInventories.map(({ character, inventory }) => (
           <div
@@ -232,9 +255,10 @@ export default function Index() {
               margin: "0 auto",
             }}
           >
-            <div style={{width: '100%', position: 'sticky', top: 0, zIndex: 99, background: '#262523', padding: 5}}>
-              <div style={{fontSize: '2em', margin: '10px 0px 5px 0px'}}>{character.name}</div>
+            <div style={{width: '100%', position: 'sticky', top: 0, zIndex: 99, background: '#262523', padding: 5, display: 'flex', alignItems: 'center'}}>
+              <div style={{fontSize: '2em', margin: '10px 0px 5px 0px'}}>{character.name}</div> <ToggleCollapsedSection collapsed={collapsedSections} setCollapsed={setCollapsedSections} section={`CH-${character.name}`} />
             </div>
+            <CollapseableSection collapsed={collapsedSections} section={`CH-${character.name}`}>
             {inventory.map((bag, idx) =>
               bag ? (
                 <div key={`${character.name}${bag.id}${idx}`}>
@@ -245,9 +269,11 @@ export default function Index() {
                 </div>
               ) : null
             )}
+            </CollapseableSection>
           </div>
         ))}
       </div>
+      </CollapseableSection>
     </div>
   );
 }
