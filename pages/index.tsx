@@ -11,6 +11,7 @@ import useSortInventories from '../components/hooks/useSortInventories'
 import useLocalstorage, { LocalStorageKeys } from '../components/hooks/useLocalstorage'
 import chunk from '../util/chunk'
 import useGuilds from '../components/hooks/useGuilds'
+import EmojiFavicon from '../components/EmojiFavicon'
 
 const BANK_SIZE = 30
 const INVENTORY_WIDTH = 10
@@ -105,15 +106,8 @@ export default function Index() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#B33951" />
         <title>Dedupe-o-tron | Find duplicates across your inventories and bank tabs that you could stack.</title>
-        <link
-          rel="icon"
-          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22>
-      <text y=%22.9em%22 font-size=%2290%22>
-        🤖
-      </text>
-    </svg>"
-        ></link>
       </Head>
+      <EmojiFavicon emoji="🤖" />
       <div
         style={{
           maxWidth: 590,
