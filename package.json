@@ -5,10 +5,13 @@
   "author": "Matthew Elphick <matt.a.elphy@gmail.com>",
   "license": "MIT",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "next",
-    "build": "next build",
-    "start": "next start",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider next build",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider next start",
     "prettier": "prettier --write --ignore-unknown --ignore-path .gitignore ."
   },
   "husky": {
